@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "types": [
+      "node"
+    ],
+    "target": "es6",
     "lib": [
       "dom",
       "dom.iterable",
@@ -18,9 +21,9 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
   },
   "include": [
-    "src"
+    "src",
+    "src/index.ts"
   ]
 }
