@@ -2,6 +2,7 @@ let main: any;
 const clients: any = {};
 
 export const addClientUnique = (id: any, socket: any) => {
+  console.log('--add unique, id:', id, 'clients:', Object.keys(clients));
   if (clients[id]) {
     return false;
   }

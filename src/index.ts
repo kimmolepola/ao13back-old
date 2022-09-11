@@ -109,7 +109,7 @@ io.on('connection', (socket: any) => {
     };
 
     const disconnect = () => {
-      socket.broadcast.emit('peerDisconnect', id);
+      socket.broadcast.emit('peerDisconnected', id);
       console.log('disconnect,', id);
       removeClient(id);
       if (getMain() && getMain() === id) {

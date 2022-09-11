@@ -130,6 +130,7 @@ export const requestPasswordReset = async (username: any) => {
     );
     return true;
   } catch (err) {
+    console.log('services -> auth.service -> requestPasswordReset error:', err);
     throw new Error('Email service error');
   }
 };

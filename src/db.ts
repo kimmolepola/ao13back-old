@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const { DB_URL } = process.env;
 
-async function connection() {
+const connection = async () => {
   const conn = mongoose.connection;
 
   conn.on('connected', () => {
@@ -34,6 +34,6 @@ async function connection() {
   } else {
     console.log('cannot connect to database, missing DB_URL');
   }
-}
+};
 
 export default connection;
