@@ -23,16 +23,16 @@ export const getGameObject = async (token: any, id: any) => {
   return data;
 };
 
-export const saveGameState = async (token: any, data: any) => {
-  const decodedToken: any = jsonwebtoken.verify(token, JWTSecret);
+export const saveGameState = async (token: string, data: { remoteId: string, score: number }[]) => {
+  const decodedToken = jsonwebtoken.verify(token, JWTSecret) as any;
   if (!token || !decodedToken.id || decodedToken.id !== getMain()) {
     const err: any = new Error('Unauthorized');
     err.statusCode = 401;
     throw err;
   }
   try {
-    const promises = data.map((x: any) => User.updateOne(
-      { _id: x.playerId },
+    const promises = data.map((x) => User.updateOne(
+      { _id: x.remoteId },
       { $set: { score: x.score } },
       { new: true, runValidators: true, context: 'query' },
     ));
