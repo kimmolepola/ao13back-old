@@ -1,16 +1,9 @@
+import { getTokenFrom } from './auth.controller';
 import {
   checkOkToStart,
   getUser,
   updateUsername,
 } from '../services/user.service';
-
-const getTokenFrom = (request: any) => {
-  const authorization = request.get('authorization');
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    return authorization.substring(7);
-  }
-  return null;
-};
 
 export const checkOkToStartController = (req: any, res: any, next: any) => {
   const token = getTokenFrom(req);

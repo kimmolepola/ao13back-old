@@ -115,7 +115,7 @@ io.on('connection', (socket: any) => {
       if (getMain() && getMain() === id) {
         setMain(null);
         Object.keys(getClients()).forEach((x) => {
-          if (!x.includes('guest_') && getMain() === null) {
+          if (getMain() === null) {
             setMain(x);
             console.log('main:', getMain());
             getClients()[x].emit('main', getMain());
@@ -127,6 +127,7 @@ io.on('connection', (socket: any) => {
           socket.broadcast.emit('nomain');
         }
       }
+      socket.disconnect();
     };
 
     socket.on('signaling', signaling);

@@ -9,11 +9,11 @@ import {
   updateUsernameController,
 } from '../controllers/user.controller';
 import {
-  guestLoginController,
   loginController,
   signUpController,
   resetPasswordRequestController,
   resetPasswordController,
+  logoutController,
 } from '../controllers/auth.controller';
 
 const router = express.Router();
@@ -23,10 +23,10 @@ router.post('/gameObject/saveGameState', saveGameStateController);
 router.get('/user/checkOkToStart', checkOkToStartController);
 router.get('/user', getUserController);
 router.post('/user/updateUsername', updateUsernameController);
-router.post('/auth/guestLogin', guestLoginController);
 router.post('/auth/login', loginController);
 router.post('/auth/signup', signUpController);
 router.post('/auth/requestResetPassword', resetPasswordRequestController);
 router.post('/auth/resetPassword', resetPasswordController);
+router.post('/auth/logout', logoutController);
 
 export default router;

@@ -19,6 +19,7 @@ export const getGameObject = async (token: any, id: any) => {
   const data = {
     username: user.username,
     score: user.score,
+    player: true,
   };
   return data;
 };

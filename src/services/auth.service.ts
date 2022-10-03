@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.model';
 import Token from '../models/Token.model';
 import sendEmail from '../utils/email/sendEmail';
+import { disconnectClient } from '../clients';
 
 const JWTSecret = process.env.JWT_SECRET || '';
 const bcryptSalt = process.env.BCRYPT_SALT;
@@ -11,18 +12,22 @@ const client = process.env.NODE_ENV === 'production'
   ? `https://${process.env.CLIENT}`
   : `http://${process.env.CLIENT}`;
 
-/* eslint-disable no-underscore-dangle, no-return-assign, no-param-reassign */
-export const guestLogin = async () => {
-  console.log('guest login');
-  const id = `guest_${Math.random().toString().substring(2)}`.substring(0, 10);
-  const token = JWT.sign({ id }, JWTSecret || '');
+export const decode = (token: any) => {
+  const decodedToken: any = JWT.verify(token, JWTSecret);
+  if (!token || !decodedToken.id) {
+    const err: any = new Error('Invalid or missing token');
+    err.statusCode = 401;
+    throw err;
+  }
+  return decodedToken;
+};
 
-  return {
-    score: 0,
-    userId: id,
-    username: id,
-    token,
-  };
+/* eslint-disable no-underscore-dangle, no-return-assign, no-param-reassign */
+export const logout = async (token: any) => {
+  const { id } = decode(token);
+  disconnectClient(id);
+  console.log(`logout ${id}`);
+  return true;
 };
 
 export const login = async (data: any) => {

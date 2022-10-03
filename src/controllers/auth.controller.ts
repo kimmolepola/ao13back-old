@@ -1,14 +1,23 @@
 import {
-  guestLogin,
   login,
   signup,
   requestPasswordReset,
   resetPassword,
+  logout,
 } from '../services/auth.service';
 
-export const guestLoginController = async (req: any, res: any, next: any) => {
-  const loginService = await guestLogin();
-  return res.json(loginService);
+export const getTokenFrom = (request: any) => {
+  const authorization = request.get('authorization');
+  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+    return authorization.substring(7);
+  }
+  return null;
+};
+
+export const logoutController = async (req: any, res: any, next: any) => {
+  const token = getTokenFrom(req);
+  const logoutService = await logout(token);
+  return res.json(logoutService);
 };
 
 export const loginController = async (req: any, res: any, next: any) => {

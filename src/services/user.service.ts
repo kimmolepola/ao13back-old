@@ -1,27 +1,9 @@
-import JWT from 'jsonwebtoken';
+import { decode } from './auth.service';
 import User from '../models/User.model';
-import { getMain, getClients } from '../clients';
-
-const JWTSecret = process.env.JWT_SECRET || '';
-
-const decode = (token: any) => {
-  const decodedToken: any = JWT.verify(token, JWTSecret);
-  if (!token || !decodedToken.id) {
-    const err: any = new Error('Invalid or missing token');
-    err.statusCode = 401;
-    throw err;
-  }
-  return decodedToken;
-};
+import { getClients } from '../clients';
 
 export const checkOkToStart = (token: any) => {
   const { id } = decode(token);
-  if (id.includes('guest_') && !getMain()) {
-    return {
-      success: false,
-      reason: 'No hosted games found, please create account to host a game',
-    };
-  }
   if (getClients()[id]) {
     return { success: false, reason: 'Session already open with this user' };
   }
