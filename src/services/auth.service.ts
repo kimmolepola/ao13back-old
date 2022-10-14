@@ -31,7 +31,7 @@ export const logout = async (token: any) => {
 };
 
 export const login = async (data: any) => {
-  console.log('login', data.username);
+  console.log('login attempt:', data.username);
   let user;
   if (data.username.includes('@')) {
     user = await User.findOne({ email: data.username });
@@ -49,6 +49,8 @@ export const login = async (data: any) => {
   }
 
   const token = JWT.sign({ id: user._id }, JWTSecret);
+
+  console.log('logged in:', user._id, user.username);
 
   return (data = {
     score: user.score,

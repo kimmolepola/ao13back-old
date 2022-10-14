@@ -12,13 +12,8 @@ export const checkOkToStart = (token: any) => {
 
 /* eslint-disable no-underscore-dangle, no-return-assign, no-param-reassign */
 export const getUser = async (token: any) => {
+  console.log('--getUser, token:', token);
   const { id } = decode(token);
-
-  if (id.includes('guest')) {
-    return {
-      score: 0, userId: id, username: id, token,
-    };
-  }
 
   const user = await User.findOne({ _id: id });
 
@@ -35,11 +30,7 @@ export const getUser = async (token: any) => {
 
 export const updateUsername = async (token: any, data: any) => {
   const { id } = decode(token);
-  if (id.includes('guest')) {
-    const err: any = new Error('Unauthorized');
-    err.statusCode = 401;
-    throw err;
-  }
+
   try {
     await User.updateOne(
       { _id: id },

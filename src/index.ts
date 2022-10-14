@@ -90,6 +90,7 @@ io.on('connection', (socket: any) => {
     console.log('connected:', id);
     socket.emit('init', id);
 
+    console.log('--if main:', getMain(), typeof getMain());
     if (!getMain()) {
       setMain(id);
       console.log('main:', getMain());

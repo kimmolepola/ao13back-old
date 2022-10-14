@@ -17,6 +17,7 @@ export const removeClient = (id: any) => {
 export const getClients = () => clients;
 
 export const setMain = (x: any) => {
+  console.log('--set main:', x);
   main = x;
 };
 
