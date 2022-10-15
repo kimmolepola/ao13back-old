@@ -72,6 +72,40 @@ io.use((socket: any, next: any) => {
   next(err);
 });
 
+const signaling = ({ remoteId, description, candidate }: any, id: any) => {
+  console.log('--signaling:', getClients()[remoteId], remoteId, description, candidate);
+  if (getClients()[remoteId]) {
+    getClients()[remoteId].emit('signaling', {
+      id,
+      description,
+      candidate,
+    });
+  }
+};
+
+export const disconnect = (id: any) => {
+  const socket = getClients()[id];
+  socket?.broadcast.emit('peerDisconnected', id);
+  console.log('disconnect,', id);
+  removeClient(id);
+  if (getMain() && getMain() === id) {
+    setMain(null);
+    Object.keys(getClients()).forEach((x) => {
+      if (getMain() === null) {
+        setMain(x);
+        console.log('main:', getMain());
+        getClients()[x].emit('main', getMain());
+      } else {
+        getClients()[x].emit('connectToMain', getMain());
+      }
+    });
+    if (!getMain()) {
+      socket?.broadcast.emit('nomain');
+    }
+  }
+  socket?.disconnect();
+};
+
 io.on('connection', (socket: any) => {
   const { token } = socket.handshake.auth;
   const id = token
@@ -96,43 +130,46 @@ io.on('connection', (socket: any) => {
       console.log('main:', getMain());
       socket.emit('main', getMain());
     } else {
-      socket.emit('connectToMain', getMain());
+      setTimeout(() => {
+        socket.emit('connectToMain', getMain());
+      }, 3000);
     }
 
-    const signaling = ({ remoteId, description, candidate }: any) => {
-      if (getClients()[remoteId]) {
-        getClients()[remoteId].emit('signaling', {
-          id,
-          description,
-          candidate,
-        });
-      }
-    };
+    // const signaling = ({ remoteId, description, candidate }: any) => {
+    //   console.log('--signaling:', getClients()[remoteId], remoteId, description, candidate);
+    //   if (getClients()[remoteId]) {
+    //     getClients()[remoteId].emit('signaling', {
+    //       id,
+    //       description,
+    //       candidate,
+    //     });
+    //   }
+    // };
 
-    const disconnect = () => {
-      socket.broadcast.emit('peerDisconnected', id);
-      console.log('disconnect,', id);
-      removeClient(id);
-      if (getMain() && getMain() === id) {
-        setMain(null);
-        Object.keys(getClients()).forEach((x) => {
-          if (getMain() === null) {
-            setMain(x);
-            console.log('main:', getMain());
-            getClients()[x].emit('main', getMain());
-          } else {
-            getClients()[x].emit('connectToMain', getMain());
-          }
-        });
-        if (!getMain()) {
-          socket.broadcast.emit('nomain');
-        }
-      }
-      socket.disconnect();
-    };
+    // const disconnect = () => {
+    //   socket.broadcast.emit('peerDisconnected', id);
+    //   console.log('disconnect,', id);
+    //   removeClient(id);
+    //   if (getMain() && getMain() === id) {
+    //     setMain(null);
+    //     Object.keys(getClients()).forEach((x) => {
+    //       if (getMain() === null) {
+    //         setMain(x);
+    //         console.log('main:', getMain());
+    //         getClients()[x].emit('main', getMain());
+    //       } else {
+    //         getClients()[x].emit('connectToMain', getMain());
+    //       }
+    //     });
+    //     if (!getMain()) {
+    //       socket.broadcast.emit('nomain');
+    //     }
+    //   }
+    //   socket.disconnect();
+    // };
 
-    socket.on('signaling', signaling);
-    socket.on('disconnect', disconnect);
+    socket.on('signaling', ({ remoteId, description, candidate }: any) => signaling({ remoteId, description, candidate }, id));
+    socket.on('disconnect', () => disconnect(id));
   }
 });
 

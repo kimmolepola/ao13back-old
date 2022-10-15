@@ -22,7 +22,3 @@ export const setMain = (x: any) => {
 };
 
 export const getMain = () => main;
-
-export const disconnectClient = (id: any) => {
-  clients[id]?.disconnect();
-};

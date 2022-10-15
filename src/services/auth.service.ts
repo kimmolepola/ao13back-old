@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 import User from '../models/User.model';
 import Token from '../models/Token.model';
 import sendEmail from '../utils/email/sendEmail';
-import { disconnectClient } from '../clients';
+import { disconnect } from '../index';
 
 const JWTSecret = process.env.JWT_SECRET || '';
 const bcryptSalt = process.env.BCRYPT_SALT;
@@ -24,8 +24,10 @@ export const decode = (token: any) => {
 
 /* eslint-disable no-underscore-dangle, no-return-assign, no-param-reassign */
 export const logout = async (token: any) => {
+  console.log('--logout, token:', token);
   const { id } = decode(token);
-  disconnectClient(id);
+  console.log('--logout, id:', id);
+  disconnect(id);
   console.log(`logout ${id}`);
   return true;
 };
