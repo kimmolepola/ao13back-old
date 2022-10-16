@@ -73,7 +73,7 @@ io.use((socket: any, next: any) => {
 });
 
 const signaling = ({ remoteId, description, candidate }: any, id: any) => {
-  console.log('--signaling:', getClients()[remoteId], remoteId, description, candidate);
+  console.log('--signaling:', Object.keys(getClients()), remoteId, description, candidate);
   if (getClients()[remoteId]) {
     getClients()[remoteId].emit('signaling', {
       id,
@@ -108,17 +108,15 @@ export const disconnect = (id: any) => {
 
 io.on('connection', (socket: any) => {
   const { token } = socket.handshake.auth;
-  const id = token
-    ? (JWT.verify(socket.handshake.auth.token, JWTSecret) as any).id
-    : null;
-  const unique = addClientUnique(id, socket);
+  const id = token && (JWT.verify(socket.handshake.auth.token, JWTSecret) as any)?.id;
+  const unique = id && addClientUnique(id, socket);
+  console.log('--onConnection:', token, id, unique);
   if (!id || !unique) {
     socket.emit('fail', id ? 'duplicateSessionError' : 'tokenError');
-    socket.disconnect();
     console.log(
       id
-        ? 'duplicate session, socket disconnect'
-        : 'token error, socket disconnect',
+        ? 'duplicate session'
+        : 'token error',
     );
   } else {
     console.log('connected:', id);
@@ -130,9 +128,7 @@ io.on('connection', (socket: any) => {
       console.log('main:', getMain());
       socket.emit('main', getMain());
     } else {
-      setTimeout(() => {
-        socket.emit('connectToMain', getMain());
-      }, 3000);
+      socket.emit('connectToMain', getMain());
     }
 
     // const signaling = ({ remoteId, description, candidate }: any) => {
