@@ -18,6 +18,7 @@ import {
 
 const router = express.Router();
 
+router.get('/', (req, res) => { console.log('request /'); return res.json('hello'); });
 router.get('/gameObject/:id', getGameObjectController);
 router.post('/gameObject/saveGameState', saveGameStateController);
 router.get('/user/checkOkToStart', checkOkToStartController);

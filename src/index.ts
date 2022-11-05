@@ -49,7 +49,7 @@ app.use((error: any, req: any, res: any, next: any) => {
 });
 
 server.listen(port, () => {
-  console.log('Listening to Port ', port);
+  console.log('Listening to port', port);
 });
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
