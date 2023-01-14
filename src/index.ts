@@ -64,6 +64,7 @@ io.use((socket: any, next: any) => {
   let err: any = null;
   if (token) {
     const decodedToken: any = JWT.verify(token, JWTSecret);
+    console.log('--decodedToken:', decodedToken);
     if (!decodedToken.id) {
       err = new Error('Invalid token');
       err.statusCode = 401;
