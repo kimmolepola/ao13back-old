@@ -9,7 +9,7 @@ import { disconnect } from '../index';
 const JWTSecret = process.env.JWT_SECRET || '';
 const bcryptSalt = process.env.BCRYPT_SALT;
 const client = process.env.NODE_ENV === 'production'
-  ? `https://${process.env.CLIENT}`
+  ? `http://${process.env.CLIENT}`
   : `http://${process.env.CLIENT}`;
 
 export const decode = (token: any) => {

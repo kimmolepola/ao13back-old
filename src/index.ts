@@ -21,7 +21,7 @@ const app = express();
 const server = http.createServer(app);
 
 const client = process.env.NODE_ENV === 'production'
-  ? `https://${process.env.CLIENT}`
+  ? `http://${process.env.CLIENT}`
   : `http://${process.env.CLIENT}`;
 
 console.log('client:', client);
@@ -60,6 +60,7 @@ const JWTSecret = process.env.JWT_SECRET || '';
 
 io.use((socket: any, next: any) => {
   const { token } = socket.handshake.auth;
+  console.log('--token:', token);
   let err: any = null;
   if (token) {
     const decodedToken: any = JWT.verify(token, JWTSecret);
