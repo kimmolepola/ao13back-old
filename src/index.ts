@@ -5,6 +5,8 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import path from 'path';
+
 import connection from './db';
 import {
   addClientUnique,
@@ -13,8 +15,6 @@ import {
   setMain,
   getMain,
 } from './clients';
-
-// API routes
 import router from './routes/index.route';
 
 const app = express();
@@ -42,6 +42,11 @@ const port = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  const filePath = path.resolve(__dirname, 'build/index.html');
+  res.sendFile(filePath);
+});
+
 app.use('/api/v1', router);
 
 app.use((error: any, req: any, res: any, next: any) => {
@@ -58,21 +63,21 @@ server.listen(port, () => {
 
 const JWTSecret = process.env.JWT_SECRET || '';
 
-io.use((socket: any, next: any) => {
-  const { token } = socket.handshake.auth;
-  console.log('--token:', token);
-  let err: any = null;
-  if (token) {
-    const decodedToken: any = JWT.verify(token, JWTSecret);
-    console.log('--decodedToken:', decodedToken);
-    if (!decodedToken.id) {
-      err = new Error('Invalid token');
-      err.statusCode = 401;
-      err.data = { content: 'Please retry later' }; // additional details
-    }
-  }
-  next(err);
-});
+// io.use((socket: any, next: any) => {
+//   const { token } = socket.handshake.auth;
+//   console.log('--token:', token);
+//   let err: any = null;
+//   if (token) {
+//     const decodedToken: any = JWT.verify(token, JWTSecret);
+//     console.log('--decodedToken:', decodedToken);
+//     if (!decodedToken.id) {
+//       err = new Error('Invalid token');
+//       err.statusCode = 401;
+//       err.data = { content: 'Please retry later' }; // additional details
+//     }
+//   }
+//   next(err);
+// });
 
 const signaling = ({ remoteId, description, candidate }: any, id: any) => {
   console.log('--signaling:', Object.keys(getClients()), remoteId, description, candidate);
