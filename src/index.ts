@@ -5,8 +5,6 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 import connection from './db';
 import {
@@ -17,9 +15,6 @@ import {
   getMain,
 } from './clients';
 import router from './routes/index.route';
-
-// eslint-disable-next-line no-underscore-dangle
-const __filename = fileURLToPath(import.meta.url);
 
 const app = express();
 const server = http.createServer(app);
@@ -46,13 +41,6 @@ const port = process.env.PORT;
 app.use(cors());
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  // eslint-disable-next-line no-underscore-dangle
-  const __dirname = path.dirname(__filename);
-  const filePath = path.join(__dirname, '/build', 'index.html');
-  res.sendFile(filePath);
-});
-
 app.use('/api/v1', router);
 
 app.use((error: any, req: any, res: any, next: any) => {
@@ -69,21 +57,21 @@ server.listen(port, () => {
 
 const JWTSecret = process.env.JWT_SECRET || '';
 
-// io.use((socket: any, next: any) => {
-//   const { token } = socket.handshake.auth;
-//   console.log('--token:', token);
-//   let err: any = null;
-//   if (token) {
-//     const decodedToken: any = JWT.verify(token, JWTSecret);
-//     console.log('--decodedToken:', decodedToken);
-//     if (!decodedToken.id) {
-//       err = new Error('Invalid token');
-//       err.statusCode = 401;
-//       err.data = { content: 'Please retry later' }; // additional details
-//     }
-//   }
-//   next(err);
-// });
+io.use((socket: any, next: any) => {
+  const { token } = socket.handshake.auth;
+  console.log('--token:', token);
+  let err: any = null;
+  if (token) {
+    const decodedToken: any = JWT.verify(token, JWTSecret);
+    console.log('--decodedToken:', decodedToken);
+    if (!decodedToken.id) {
+      err = new Error('Invalid token');
+      err.statusCode = 401;
+      err.data = { content: 'Please retry later' }; // additional details
+    }
+  }
+  next(err);
+});
 
 const signaling = ({ remoteId, description, candidate }: any, id: any) => {
   console.log('--signaling:', Object.keys(getClients()), remoteId, description, candidate);
@@ -120,8 +108,22 @@ export const disconnect = (id: any) => {
 };
 
 io.on('connection', (socket: any) => {
+  console.log('--CONNECTION, clients:', Object.keys(getClients()));
+  const transport = socket.conn.transport.name;
+  console.log('--TRANSPORT:', transport);
+  socket.conn.on('upgrade', () => {
+    const upgradedTransport = socket.conn.transport.name; // in most cases, "websocket"
+    console.log('--UPGRADEDTRANSPORT:', upgradedTransport);
+  });
+
   const { token } = socket.handshake.auth;
-  const id = token && (JWT.verify(socket.handshake.auth.token, JWTSecret) as any)?.id;
+  console.log('--TOKEN:', token);
+  let id: any;
+  try {
+    id = token && (JWT.verify(socket.handshake.auth.token, JWTSecret) as any)?.id;
+  } catch (err) {
+    console.log('--JWT error:', err);
+  }
   const unique = id && addClientUnique(id, socket);
   console.log('--onConnection:', token, id, unique);
   if (!id || !unique) {
@@ -144,40 +146,11 @@ io.on('connection', (socket: any) => {
       socket.emit('connectToMain', getMain());
     }
 
-    // const signaling = ({ remoteId, description, candidate }: any) => {
-    //   console.log('--signaling:', getClients()[remoteId], remoteId, description, candidate);
-    //   if (getClients()[remoteId]) {
-    //     getClients()[remoteId].emit('signaling', {
-    //       id,
-    //       description,
-    //       candidate,
-    //     });
-    //   }
-    // };
-
-    // const disconnect = () => {
-    //   socket.broadcast.emit('peerDisconnected', id);
-    //   console.log('disconnect,', id);
-    //   removeClient(id);
-    //   if (getMain() && getMain() === id) {
-    //     setMain(null);
-    //     Object.keys(getClients()).forEach((x) => {
-    //       if (getMain() === null) {
-    //         setMain(x);
-    //         console.log('main:', getMain());
-    //         getClients()[x].emit('main', getMain());
-    //       } else {
-    //         getClients()[x].emit('connectToMain', getMain());
-    //       }
-    //     });
-    //     if (!getMain()) {
-    //       socket.broadcast.emit('nomain');
-    //     }
-    //   }
-    //   socket.disconnect();
-    // };
-
-    socket.on('signaling', ({ remoteId, description, candidate }: any) => signaling({ remoteId, description, candidate }, id));
+    socket.on('signaling', ({
+      remoteId,
+      description,
+      candidate,
+    }: any) => signaling({ remoteId, description, candidate }, id));
     socket.on('disconnect', () => disconnect(id));
   }
 });
