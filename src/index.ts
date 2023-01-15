@@ -6,6 +6,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 import connection from './db';
 import {
@@ -16,6 +17,9 @@ import {
   getMain,
 } from './clients';
 import router from './routes/index.route';
+
+// eslint-disable-next-line no-underscore-dangle
+const __filename = fileURLToPath(import.meta.url);
 
 const app = express();
 const server = http.createServer(app);
@@ -43,7 +47,9 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  const filePath = path.resolve(__dirname, 'build/index.html');
+  // eslint-disable-next-line no-underscore-dangle
+  const __dirname = path.dirname(__filename);
+  const filePath = path.join(__dirname, '/build', 'index.html');
   res.sendFile(filePath);
 });
 
