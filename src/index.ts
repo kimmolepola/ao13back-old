@@ -20,7 +20,7 @@ const app = express();
 const server = http.createServer(app);
 
 const client = process.env.NODE_ENV === 'production'
-  ? `http://${process.env.CLIENT}`
+  ? `https://${process.env.CLIENT}`
   : `http://${process.env.CLIENT}`;
 
 console.log('client:', client);
