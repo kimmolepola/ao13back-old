@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import crypto from 'crypto';
 import JWT from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
@@ -30,6 +31,31 @@ export const logout = async (token: any) => {
   disconnect(id);
   console.log(`logout ${id}`);
   return true;
+};
+
+export const getTurnCredentials = (token: any) => {
+  console.log('--get TURN credentials', token);
+  const { id } = decode(token);
+  const secretKey = process.env.HMAC_SECRET;
+  if (!secretKey) {
+    const err: any = new Error('Server error');
+    err.statusCode = 500;
+    throw err;
+  }
+
+  // this credential will be valid for the next 60 seconds
+  const unixTimeStamp = Math.floor(Date.now() / 1000) + 60;
+  const username = [unixTimeStamp, id].join(':');
+  const secret = Buffer.from(secretKey, 'base64');
+  const hmac = crypto.createHmac('SHA256', secret);
+  hmac.setEncoding('base64');
+  hmac.write(username);
+  hmac.end();
+  const password = hmac.read();
+  return {
+    username,
+    password,
+  };
 };
 
 export const login = async (data: any) => {

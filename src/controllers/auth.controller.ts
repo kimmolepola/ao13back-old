@@ -1,4 +1,5 @@
 import {
+  getTurnCredentials,
   login,
   signup,
   requestPasswordReset,
@@ -18,6 +19,12 @@ export const logoutController = async (req: any, res: any, next: any) => {
   const token = getTokenFrom(req);
   const logoutService = await logout(token);
   return res.json(logoutService);
+};
+
+export const turnCredentialsController = async (req: any, res: any, next: any) => {
+  const token = getTokenFrom(req);
+  const turnCredentialsService = await getTurnCredentials(token);
+  return res.json(turnCredentialsService);
 };
 
 export const loginController = async (req: any, res: any, next: any) => {

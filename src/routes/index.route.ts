@@ -10,6 +10,7 @@ import {
 } from '../controllers/user.controller';
 import {
   loginController,
+  turnCredentialsController,
   signUpController,
   resetPasswordRequestController,
   resetPasswordController,
@@ -24,6 +25,7 @@ router.post('/gameObject/saveGameState', saveGameStateController);
 router.get('/user/checkOkToStart', checkOkToStartController);
 router.get('/user', getUserController);
 router.post('/user/updateUsername', updateUsernameController);
+router.post('/auth/getTurnCredentials', turnCredentialsController);
 router.post('/auth/login', loginController);
 router.post('/auth/signup', signUpController);
 router.post('/auth/requestResetPassword', resetPasswordRequestController);
