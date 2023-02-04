@@ -43,8 +43,8 @@ export const getTurnCredentials = (token: any) => {
     throw err;
   }
 
-  // this credential will be valid for the next 60 seconds
-  const unixTimeStamp = Math.floor(Date.now() / 1000) + 60;
+  // this credential will be valid for the next 48 hours
+  const unixTimeStamp = Math.floor(Date.now() / 1000) + 60 * 60 * 48;
   const username = [unixTimeStamp, id].join(':');
   const secret = Buffer.from(secretKey, 'base64');
   const hmac = crypto.createHmac('SHA256', secret);
