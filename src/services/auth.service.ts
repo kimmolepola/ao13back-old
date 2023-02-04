@@ -47,7 +47,7 @@ export const getTurnCredentials = (token: any) => {
   const unixTimeStamp = Math.floor(Date.now() / 1000) + 60 * 60 * 48;
   const username = [unixTimeStamp, id].join(':');
   const secret = Buffer.from(secretKey, 'base64');
-  const hmac = crypto.createHmac('SHA256', secret);
+  const hmac = crypto.createHmac('sha1', secret);
   hmac.setEncoding('base64');
   hmac.write(username);
   hmac.end();
