@@ -26,7 +26,7 @@ const internalIpv4Address = networkInterfaces()?.['Wi-Fi']?.find((x) => !x.inter
 
 const origin = process.env.NODE_ENV === 'production'
   ? `https://${process.env.CLIENT_HOST}`
-  : [`http://${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`, `http://${internalIpv4Address}:${process.env.CLIENT_PORT}`];
+  : [`http://${process.env.CLIENT_HOST}:${process.env.DEV_CLIENT_PORT}`, `http://${internalIpv4Address}:${process.env.DEV_CLIENT_PORT}`];
 
 console.log('origin:', origin);
 
