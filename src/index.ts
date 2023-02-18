@@ -5,6 +5,7 @@ import cors from 'cors';
 import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
+import { networkInterfaces } from 'os';
 
 import connection from './db';
 import {
@@ -16,18 +17,22 @@ import {
 } from './clients';
 import router from './routes/index.route';
 
+console.log('--networkInterfaces:', networkInterfaces()?.['Wi-Fi']?.find((x) => !x.internal && x.family === 'IPv4'));
+
 const app = express();
 const server = http.createServer(app);
 
-const client = process.env.NODE_ENV === 'production'
-  ? `https://${process.env.CLIENT}`
-  : `http://${process.env.CLIENT}`;
+const internalIpv4Address = networkInterfaces()?.['Wi-Fi']?.find((x) => !x.internal && x.family === 'IPv4')?.address;
 
-console.log('client:', client);
+const origin = process.env.NODE_ENV === 'production'
+  ? `https://${process.env.CLIENT_HOST}`
+  : [`http://${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`, `http://${internalIpv4Address}:${process.env.CLIENT_PORT}`];
+
+console.log('origin:', origin);
 
 const io = new Server(server, {
   cors: {
-    origin: client,
+    origin,
     methods: ['GET', 'POST'],
   },
 });
@@ -59,7 +64,7 @@ const JWTSecret = process.env.JWT_SECRET || '';
 
 io.use((socket: any, next: any) => {
   const { token } = socket.handshake.auth;
-  console.log('--token:', token);
+  console.log('--io.use, token:', token);
   let err: any = null;
   if (token) {
     const decodedToken: any = JWT.verify(token, JWTSecret);

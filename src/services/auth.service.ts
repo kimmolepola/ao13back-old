@@ -10,8 +10,8 @@ import { disconnect } from '../index';
 const JWTSecret = process.env.JWT_SECRET || '';
 const bcryptSalt = process.env.BCRYPT_SALT;
 const client = process.env.NODE_ENV === 'production'
-  ? `https://${process.env.CLIENT}`
-  : `http://${process.env.CLIENT}`;
+  ? `https://${process.env.CLIENT_HOST}`
+  : `http://${process.env.CLIENT_HOST}:${process.env.CLIENT_HOST_PORT}`;
 
 export const decode = (token: any) => {
   const decodedToken: any = JWT.verify(token, JWTSecret);
