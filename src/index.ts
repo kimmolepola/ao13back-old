@@ -92,6 +92,9 @@ const signaling = ({ remoteId, description, candidate }: any, id: any) => {
 export const disconnect = (id: any) => {
   const socket = getClients()[id];
   socket?.broadcast.emit('peerDisconnected', id);
+  if (getMain() && getMain() === id) {
+    socket?.broadcast.emit('mainDisconnected', id);
+  }
   console.log('disconnect,', id);
   removeClient(id);
   if (getMain() && getMain() === id) {
@@ -156,6 +159,7 @@ io.on('connection', (socket: any) => {
       description,
       candidate,
     }: any) => signaling({ remoteId, description, candidate }, id));
+
     socket.on('disconnect', () => disconnect(id));
   }
 });
