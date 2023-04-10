@@ -17,12 +17,13 @@ import {
 } from './clients';
 import router from './routes/index.route';
 
-console.log('--networkInterfaces:', networkInterfaces()?.['Wi-Fi']?.find((x) => !x.internal && x.family === 'IPv4'));
+console.log("--all networkInterfaces:", (networkInterfaces()?.['Wi-Fi'] || networkInterfaces()?.['WLAN']));
+console.log('--networkInterfaces:', (networkInterfaces()?.['Wi-Fi'] || networkInterfaces()?.['WLAN'])?.find((x) => !x.internal && x.family === 'IPv4'));
 
 const app = express();
 const server = http.createServer(app);
 
-const internalIpv4Address = networkInterfaces()?.['Wi-Fi']?.find((x) => !x.internal && x.family === 'IPv4')?.address;
+const internalIpv4Address = (networkInterfaces()?.['Wi-Fi'] || networkInterfaces()?.['WLAN'])?.find((x) => !x.internal && x.family === 'IPv4')?.address;
 
 const origin = process.env.NODE_ENV === 'production'
   ? `https://${process.env.CLIENT_HOST}`
